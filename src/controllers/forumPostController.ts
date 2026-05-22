@@ -125,13 +125,14 @@ const upsertTags = async (tags: string[]) => {
 export const createForumPost = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const { title, body, tags } = (req as any).validated.body;
+    const { title, body, tags, courseId } = (req as any).validated.body;
     const normalizedTags = normalizeTags(tags);
 
     const [post] = await db
       .insert(forumPosts)
       .values({
         userId,
+        courseId: courseId ?? null,
         title,
         body,
       })
@@ -189,20 +190,22 @@ export const createForumPost = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllForumPosts = async (_req: Request, res: Response) => {
+export const getAllForumPosts = async (req: Request, res: Response) => {
   try {
-    const page = Math.max(1, Number(_req.query.page) || 1);
-    const limitRaw = Number(_req.query.limit) || 20;
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limitRaw = Number(req.query.limit) || 20;
     const limit = Math.min(Math.max(1, limitRaw), 100);
     const offset = (page - 1) * limit;
+    const courseId = req.query.courseId ? Number(req.query.courseId) : undefined;
 
-    const [countResult] = await db
+    const whereClause = courseId ? eq(forumPosts.courseId, courseId) : undefined;
+
+    const countQuery = db
       .select({ count: sql<number>`count(*)` })
-      .from(forumPosts);
-    const total = Number(countResult?.count ?? 0);
-    const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
-
-    const posts = await db.query.forumPosts.findMany({
+      .from(forumPosts)
+      .where(whereClause);
+    const dataQuery = db.query.forumPosts.findMany({
+      where: whereClause,
       with: {
         user: true,
         replies: {
@@ -215,6 +218,10 @@ export const getAllForumPosts = async (_req: Request, res: Response) => {
       limit,
       offset,
     });
+
+    const [[countResult], posts] = await Promise.all([countQuery, dataQuery]);
+    const total = Number(countResult?.count ?? 0);
+    const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
 
     const postIds = posts.map((post) => post.id);
     const replyIds = posts.flatMap((post) => post.replies?.map((r) => r.id) ?? []);
@@ -296,7 +303,7 @@ export const getForumPostById = async (req: Request, res: Response) => {
 export const updateForumPost = async (req: Request, res: Response) => {
   try {
     const { postId } = req.params;
-    const { title, body, tags } = (req as any).validated.body;
+    const { title, body, tags, courseId } = (req as any).validated.body;
     const currentUser = (req as any).user;
     const normalizedTags = normalizeTags(tags);
 
@@ -317,6 +324,7 @@ export const updateForumPost = async (req: Request, res: Response) => {
       .set({
         title,
         body,
+        courseId: courseId ?? null,
         updatedAt: new Date(),
       })
       .where(eq(forumPosts.id, Number(postId)))

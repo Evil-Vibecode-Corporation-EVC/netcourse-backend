@@ -66,6 +66,7 @@ export const coursesRelations = relations(courses, ({many}) => ({
 	badges: many(badges),
 	certifications: many(certifications),
 	ratings: many(courseRatings),
+	forumPosts: many(forumPosts),
 }));
 
 export const usersRelations = relations(users, ({many}) => ({
@@ -156,6 +157,10 @@ export const forumPostsRelations = relations(forumPosts, ({one, many}) => ({
 	user: one(users, {
 		fields: [forumPosts.userId],
 		references: [users.id]
+	}),
+	course: one(courses, {
+		fields: [forumPosts.courseId],
+		references: [courses.id]
 	}),
 	replies: many(forumReplies),
 	tags: many(forumPostTags),

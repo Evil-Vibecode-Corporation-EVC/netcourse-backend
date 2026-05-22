@@ -434,6 +434,7 @@ export const forumPosts = pgTable(
   {
     id: serial().primaryKey().notNull(),
     userId: integer("user_id").notNull(),
+    courseId: integer("course_id"),
     title: text().notNull(),
     body: text().notNull(),
     createdAt: timestamp("created_at", { precision: 3, mode: "date" })
@@ -451,6 +452,13 @@ export const forumPosts = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
+    foreignKey({
+      columns: [table.courseId],
+      foreignColumns: [courses.id],
+      name: "ForumPosts_course_id_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("set null"),
   ],
 );
 
