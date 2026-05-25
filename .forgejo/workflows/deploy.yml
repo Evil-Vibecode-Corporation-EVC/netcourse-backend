@@ -7,22 +7,15 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: host
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Update Backend and Restart
-        env:
-          DOCKER_HOST: unix:///var/run/docker.sock
         run: |
-          docker build -t netcourse-backend:latest .
+          cd /home/miha/srv
           
-          docker stop netcourse-backend || true
-          docker rm netcourse-backend || true
+          docker compose up -d --build netcourse-backend
 
-          docker run -d --name netcourse-backend --volumes-from netcourse-backend netcourse-backend:latest || \
- 
           docker system prune -f
-
-
