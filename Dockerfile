@@ -9,7 +9,7 @@ FROM base AS deps
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile 
 
 FROM deps AS builder
 
@@ -19,7 +19,7 @@ RUN pnpm build
 
 RUN pnpm prune --prod
 
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 
 RUN corepack enable
 
