@@ -14,7 +14,14 @@ jobs:
 
       - name: Update Backend and Restart
         run: |
-          docker compose -f /home/miha/srv/docker-compose.yml -p srv up -d --build netcourse-backend
+          docker build -t netcourse-backend:latest .
           
+          docker stop netcourse-backend || true
+          docker rm netcourse-backend || true
+
+          docker run -d --name netcourse-backend --volumes-from netcourse-backend netcourse-backend:latest || \
+          echo "Если контейнера не было, запустите его один раз вручную через ваш compose-файл на сервере"
+
           docker system prune -f
+
 
