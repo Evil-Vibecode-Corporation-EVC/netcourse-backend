@@ -130,6 +130,40 @@ Liveness check для оркестрации/мониторинга.
 }
 ```
 
+---
+
+## DeepSeek
+
+Маршруты: `/deepseek`. Требуется аутентификация.
+
+### POST /deepseek/chat
+
+Отправить сообщение в DeepSeek. Допускаются только темы по сетям, программированию и связанным направлениям.
+
+**Request Body:**
+```json
+{
+  "message": "Explain TCP vs UDP."
+}
+```
+
+**Response:**
+```json
+{
+  "message": "TCP обеспечивает надежную доставку..."
+}
+```
+
+**Response (off-topic):**
+```json
+{
+  "error": "off_topic",
+  "message": "I can only discuss networking, programming, and related software topics. Please ask about those subjects."
+}
+```
+
+**Примечание:** Используется модель `deepseek-chat-flash`.
+
 ## Пользователи (Users)
 
 Маршруты определены в `/users`. Требуется аутентификация.

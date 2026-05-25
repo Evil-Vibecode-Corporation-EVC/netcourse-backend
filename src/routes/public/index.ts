@@ -17,6 +17,7 @@ import forumRepliesRoutes from "./forumReplies";
 import profileRoutes from "./profiles";
 import courseRatingRoutes from "./courseRatings";
 import siteVisitsRoutes from "./siteVisits";
+import deepseekRoutes from "./deepseek";
 
 const router = Router();
 
@@ -47,5 +48,6 @@ router.use("/forum/posts/:postId/replies", forumRepliesRoutes);
 router.use("/profiles", profileRoutes);
 router.use("/courses/:courseId/ratings", courseRatingRoutes);
 router.use("/site-visits", siteVisitsRoutes);
+router.use("/deepseek", deepseekRoutes);
 
 export default router;
