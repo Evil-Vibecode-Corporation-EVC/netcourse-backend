@@ -1,4 +1,3 @@
-
 name: Deploy Backend
 
 on:
@@ -24,6 +23,6 @@ jobs:
 
           cd /home/miha/srv
 
-          docker compose up -d --build netcourse-backend
+          docker compose -f /home/miha/srv/docker-compose.yml -p srv up -d --build netcourse-backend
 
           docker system prune -f
