@@ -25,4 +25,7 @@ RUN chown -R node:node /usr/src/app
 USER node
 
 EXPOSE 3000
-CMD ["node", "dist/server.js"]
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x entrypoint.sh
+
+CMD ["./entrypoint.sh"]
