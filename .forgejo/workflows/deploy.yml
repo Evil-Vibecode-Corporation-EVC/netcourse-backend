@@ -14,7 +14,7 @@ jobs:
 
       - name: Update Backend and Restart
         run: |
-          docker compose up -d --build
+          docker compose -f /home/miha/srv/docker-compose.yml -p srv up -d --build netcourse-backend
           
           docker system prune -f
 
