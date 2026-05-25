@@ -7,9 +7,10 @@ WORKDIR /usr/src/app
 
 FROM base AS deps
 
-COPY package.json pnpm-lock.yaml ./
-
-RUN pnpm install --frozen-lockfile 
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+ENV PNPM_IGNORE_SCRIPTS=false
+ENV PNPM_ENABLE_PREPOST_SCRIPTS=true
+RUN pnpm install --frozen-lockfile --ignore-scripts=false
 
 FROM deps AS builder
 
@@ -34,6 +35,8 @@ COPY --from=builder /usr/src/app/package.json ./package.json
 COPY --from=builder /usr/src/app/entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x entrypoint.sh
+
+RUN mkdir -p logs && chown node:node logs
 
 USER node
 

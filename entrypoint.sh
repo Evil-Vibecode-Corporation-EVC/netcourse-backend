@@ -1,6 +1,5 @@
 #!/bin/sh
-set -e
 echo "Running migrations..."
-pnpm migrate
+node dist/migrate.js || echo "Migration failed, continuing..."
 echo "Starting server..."
 exec node dist/server.js

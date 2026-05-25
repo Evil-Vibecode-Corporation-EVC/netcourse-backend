@@ -10,5 +10,6 @@
     "skipLibCheck": true,
     "moduleResolution": "node",
     "module": "CommonJS"
-  }
+  },
+  "exclude": ["drizzle.config.ts"]
 }

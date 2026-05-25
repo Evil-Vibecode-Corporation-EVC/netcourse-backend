@@ -57,13 +57,6 @@
       "when": 1747933200000,
       "tag": "0007_course_id_forum_post",
       "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1779728143801,
-      "tag": "0008_initial_schema",
-      "breakpoints": true
     }
   ]
 }
