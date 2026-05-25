@@ -22,10 +22,10 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/package.json ./package.json
 
 RUN chown -R node:node /usr/src/app
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x entrypoint.sh
 USER node
 
 EXPOSE 3000
-COPY entrypoint.sh ./entrypoint.sh
-RUN chmod +x entrypoint.sh
 
 CMD ["./entrypoint.sh"]
