@@ -1,5 +1,6 @@
 #!/bin/sh
+set -e
 echo "Running migrations..."
-npm run migrate
+pnpm migrate
 echo "Starting server..."
 exec node dist/server.js

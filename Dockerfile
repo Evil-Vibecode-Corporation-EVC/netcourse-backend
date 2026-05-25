@@ -1,29 +1,40 @@
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS base
 
-RUN apk add --no-cache python3 build-base
+RUN apk add --no-cache python3 make g++
+RUN corepack enable
 
 WORKDIR /usr/src/app
 
-COPY package.json package-lock.json ./
+FROM base AS deps
 
-RUN npm ci --unsafe-perm --no-audit --no-fund
+COPY package.json pnpm-lock.yaml ./
+
+RUN pnpm install --frozen-lockfile
+
+FROM deps AS builder
 
 COPY . .
-RUN npm run build
 
-RUN npm prune --production --silent
+RUN pnpm build
+
+RUN pnpm prune --prod
 
 FROM node:20-alpine AS runner
+
+RUN corepack enable
+
 WORKDIR /usr/src/app
-ENV NODE_ENV=production PORT=3000
+
+ENV NODE_ENV=production
+ENV PORT=3000
 
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/package.json ./package.json
+COPY --from=builder /usr/src/app/entrypoint.sh ./entrypoint.sh
 
-RUN chown -R node:node /usr/src/app
-COPY entrypoint.sh ./entrypoint.sh
 RUN chmod +x entrypoint.sh
+
 USER node
 
 EXPOSE 3000

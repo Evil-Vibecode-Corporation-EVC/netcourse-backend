@@ -1,0 +1,140 @@
+CREATE TYPE "public"."SocialPlatform" AS ENUM('github', 'twitter', 'youtube', 'website', 'other');--> statement-breakpoint
+CREATE TABLE "badges" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"description" text,
+	"image_url" text,
+	"course_id" integer
+);
+--> statement-breakpoint
+CREATE TABLE "certifications" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"course_id" integer NOT NULL,
+	"issued_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"certificate_code" text NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "course_ratings" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"course_id" integer NOT NULL,
+	"rating" integer NOT NULL,
+	"created_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"updated_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "forum_post_likes" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"post_id" integer NOT NULL,
+	"user_id" integer NOT NULL,
+	"created_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "forum_post_tags" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"post_id" integer NOT NULL,
+	"tag_id" integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "forum_posts" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"course_id" integer,
+	"title" text NOT NULL,
+	"body" text NOT NULL,
+	"created_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"updated_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "forum_replies" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"post_id" integer NOT NULL,
+	"user_id" integer NOT NULL,
+	"body" text NOT NULL,
+	"created_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"updated_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "forum_reply_likes" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"reply_id" integer NOT NULL,
+	"user_id" integer NOT NULL,
+	"created_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "forum_reply_tags" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"reply_id" integer NOT NULL,
+	"tag_id" integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "forum_tags" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" text NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "quiz_attempts" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"quiz_id" integer NOT NULL,
+	"score" integer NOT NULL,
+	"passed" boolean DEFAULT false NOT NULL,
+	"completed_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "site_visits" (
+	"id" integer PRIMARY KEY NOT NULL,
+	"count" integer DEFAULT 0 NOT NULL,
+	"updated_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "user_badges" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"badge_id" integer NOT NULL,
+	"awarded_at" timestamp (3) DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "user_social_links" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"platform" "SocialPlatform" NOT NULL,
+	"url" text NOT NULL
+);
+--> statement-breakpoint
+ALTER TABLE "users" ADD COLUMN "bio" text;--> statement-breakpoint
+ALTER TABLE "courses" ADD COLUMN "require_quiz_completion" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE "courses" ADD COLUMN "min_quiz_score" integer DEFAULT 65 NOT NULL;--> statement-breakpoint
+ALTER TABLE "badges" ADD CONSTRAINT "Badge_course_id_fkey" FOREIGN KEY ("course_id") REFERENCES "public"."courses"("id") ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "certifications" ADD CONSTRAINT "Certification_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "certifications" ADD CONSTRAINT "Certification_course_id_fkey" FOREIGN KEY ("course_id") REFERENCES "public"."courses"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "course_ratings" ADD CONSTRAINT "CourseRatings_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "course_ratings" ADD CONSTRAINT "CourseRatings_course_id_fkey" FOREIGN KEY ("course_id") REFERENCES "public"."courses"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "forum_post_likes" ADD CONSTRAINT "ForumPostLikes_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "public"."forum_posts"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "forum_post_likes" ADD CONSTRAINT "ForumPostLikes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "forum_post_tags" ADD CONSTRAINT "ForumPostTags_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "public"."forum_posts"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "forum_post_tags" ADD CONSTRAINT "ForumPostTags_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "public"."forum_tags"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "forum_posts" ADD CONSTRAINT "ForumPosts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "forum_posts" ADD CONSTRAINT "ForumPosts_course_id_fkey" FOREIGN KEY ("course_id") REFERENCES "public"."courses"("id") ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "forum_replies" ADD CONSTRAINT "ForumReplies_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "public"."forum_posts"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "forum_replies" ADD CONSTRAINT "ForumReplies_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "forum_reply_likes" ADD CONSTRAINT "ForumReplyLikes_reply_id_fkey" FOREIGN KEY ("reply_id") REFERENCES "public"."forum_replies"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "forum_reply_likes" ADD CONSTRAINT "ForumReplyLikes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "forum_reply_tags" ADD CONSTRAINT "ForumReplyTags_reply_id_fkey" FOREIGN KEY ("reply_id") REFERENCES "public"."forum_replies"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "forum_reply_tags" ADD CONSTRAINT "ForumReplyTags_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "public"."forum_tags"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "quiz_attempts" ADD CONSTRAINT "QuizAttempts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "quiz_attempts" ADD CONSTRAINT "QuizAttempts_quiz_id_fkey" FOREIGN KEY ("quiz_id") REFERENCES "public"."quizzes"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "user_badges" ADD CONSTRAINT "UserBadge_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "user_badges" ADD CONSTRAINT "UserBadge_badge_id_fkey" FOREIGN KEY ("badge_id") REFERENCES "public"."badges"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "user_social_links" ADD CONSTRAINT "UserSocialLinks_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+CREATE UNIQUE INDEX "certifications_user_id_course_id_key" ON "certifications" USING btree ("user_id" int4_ops,"course_id" int4_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "certifications_certificate_code_key" ON "certifications" USING btree ("certificate_code" text_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "course_ratings_user_id_course_id_key" ON "course_ratings" USING btree ("user_id" int4_ops,"course_id" int4_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "forum_post_likes_post_id_user_id_key" ON "forum_post_likes" USING btree ("post_id" int4_ops,"user_id" int4_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "forum_post_tags_post_id_tag_id_key" ON "forum_post_tags" USING btree ("post_id" int4_ops,"tag_id" int4_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "forum_reply_likes_reply_id_user_id_key" ON "forum_reply_likes" USING btree ("reply_id" int4_ops,"user_id" int4_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "forum_reply_tags_reply_id_tag_id_key" ON "forum_reply_tags" USING btree ("reply_id" int4_ops,"tag_id" int4_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "forum_tags_name_key" ON "forum_tags" USING btree ("name" text_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "user_badges_user_id_badge_id_key" ON "user_badges" USING btree ("user_id" int4_ops,"badge_id" int4_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "users_username_key" ON "users" USING btree ("username" text_ops);
