@@ -1,3 +1,4 @@
+
 name: Deploy Backend
 
 on:
@@ -9,13 +10,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Update Backend and Restart
         run: |
-          cd /home/miha/srv/netcourse-backend
+          APP_DIR="/home/miha/srv/netcourse-backend"
 
-          git pull origin main
+          rm -rf $APP_DIR/*
+          mkdir -p $APP_DIR
+
+          cp -R ./* $APP_DIR/
 
           cd /home/miha/srv
+
           docker compose up -d --build netcourse-backend
 
           docker system prune -f
