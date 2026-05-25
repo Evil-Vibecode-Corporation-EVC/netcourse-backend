@@ -1,28 +1,23 @@
 name: Deploy Backend
-
 on:
   push:
     branches:
       - main
-
+      - runner-test
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Update Backend and Restart
+      - name: Deploy via SSH
         run: |
-          APP_DIR="/home/miha/srv/netcourse-backend"
-
-          rm -rf $APP_DIR/*
-          mkdir -p $APP_DIR
-
-          cp -R ./* $APP_DIR/
-
-          cd /home/miha/srv
-
-          docker compose -f /home/miha/srv/docker-compose.yml -p srv up -d --build netcourse-backend
-
-          docker system prune -f
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=no \
+              -p 2232 \
+              miha@172.17.0.1 \
+              "cd /home/miha/srv && \
+               git -C /home/miha/srv/netcourse-backend pull && \
+               docker compose -f /home/miha/srv/docker-compose.yml -p srv up -d --build netcourse-backend && \
+               docker system prune -f"
