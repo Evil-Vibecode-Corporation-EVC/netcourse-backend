@@ -103,8 +103,6 @@ CREATE TABLE "user_social_links" (
 	"url" text NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "links" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-DROP TABLE "links" CASCADE;--> statement-breakpoint
 ALTER TABLE "users" ADD COLUMN "bio" text;--> statement-breakpoint
 ALTER TABLE "courses" ADD COLUMN "require_quiz_completion" boolean DEFAULT false NOT NULL;--> statement-breakpoint
 ALTER TABLE "courses" ADD COLUMN "min_quiz_score" integer DEFAULT 65 NOT NULL;--> statement-breakpoint
