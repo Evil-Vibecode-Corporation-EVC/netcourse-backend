@@ -4,10 +4,38 @@ import { requestLogger } from "./middleware/requestLogger";
 import { errorHandler } from "./middleware/errorHandler";
 
 import express, { Application } from "express";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 
 const app: Application = express();
-app.use(cors());
+
+const allowedOrigins = (process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const defaultOrigins = [
+  "https://netcourse.tech",
+  "https://www.netcourse.tech",
+  "http://localhost:3000",
+  "http://localhost:5173",
+];
+
+const corsOptions: CorsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+
+    const origins = allowedOrigins.length > 0 ? allowedOrigins : defaultOrigins;
+    if (origins.includes(origin)) return callback(null, true);
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-turnstile-token"],
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(requestLogger);
 
 app.use(express.json());
