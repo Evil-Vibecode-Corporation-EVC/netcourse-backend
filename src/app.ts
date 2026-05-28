@@ -16,6 +16,9 @@ const allowedOrigins = (process.env.CORS_ORIGINS || "")
 const defaultOrigins = [
   "https://netcourse.tech",
   "https://www.netcourse.tech",
+  "https://admin.netcourse.tech",
+  "https://forum.netcourse.tech",
+  "/.*\.netcourse\.tech$/",
   "http://localhost:3000",
   "http://localhost:5173",
 ];
