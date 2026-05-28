@@ -42,10 +42,13 @@ export const getAllQuizzes = async (req: Request, res: Response) => {
 
 export const getQuizById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id, lessonId } = req.params;
 
     const quiz = await db.query.quizzes.findFirst({
-      where: eq(quizzes.id, Number(id)),
+      where: and(
+        eq(quizzes.id, Number(id)),
+        eq(quizzes.lessonId, Number(lessonId)),
+      ),
       with: {
         lesson: true,
         questions: {

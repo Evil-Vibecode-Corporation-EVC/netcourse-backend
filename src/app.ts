@@ -1,6 +1,7 @@
 import publicRoutes from "./routes/public";
 import adminRoutes from "./routes/admin";
 import { requestLogger } from "./middleware/requestLogger";
+import { errorHandler } from "./middleware/errorHandler";
 
 import express, { Application } from "express";
 import cors from "cors";
@@ -27,5 +28,7 @@ app.use("/api/admin", (req, _res, next) => {
 app.use("/api", publicRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/admin", express.static("public/admin"));
+
+app.use(errorHandler);
 
 export default app;

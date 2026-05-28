@@ -11,5 +11,5 @@
     "moduleResolution": "node",
     "module": "CommonJS"
   },
-  "exclude": ["drizzle.config.ts"]
+  "exclude": ["drizzle.config.ts", "dist", "node_modules"]
 }

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../drizzle/db";
 import { lessons } from "../drizzle/schema";
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, and } from "drizzle-orm";
 
 export const createLesson = async (req: Request, res: Response) => {
   try {
@@ -59,10 +59,13 @@ export const getAllLessons = async (req: Request, res: Response) => {
 
 export const getLessonById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id, sectionId } = req.params;
 
     const lesson = await db.query.lessons.findFirst({
-      where: eq(lessons.id, Number(id)),
+      where: and(
+        eq(lessons.id, Number(id)),
+        eq(lessons.sectionId, Number(sectionId)),
+      ),
       with: {
         section: true,
         quizzes: true,

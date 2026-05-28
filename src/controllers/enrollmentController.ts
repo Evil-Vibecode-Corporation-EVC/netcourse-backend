@@ -23,7 +23,10 @@ export const createEnrollment = async (req: Request, res: Response) => {
     }).returning();
 
     res.status(201).json(enrollment);
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.code === "23505") {
+      return res.status(409).json({ error: "User is already enrolled in this course" });
+    }
     res.status(500).json({ error: "Failed to create enrollment" });
   }
 };

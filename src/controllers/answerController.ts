@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../drizzle/db";
 import { answers } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export const createAnswer = async (req: Request, res: Response) => {
   try {
@@ -37,10 +37,13 @@ export const getAllAnswers = async (req: Request, res: Response) => {
 
 export const getAnswerById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id, questionId } = req.params;
 
     const answer = await db.query.answers.findFirst({
-      where: eq(answers.id, Number(id)),
+      where: and(
+        eq(answers.id, Number(id)),
+        eq(answers.questionId, Number(questionId)),
+      ),
       with: { question: true },
     });
 
