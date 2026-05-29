@@ -81,6 +81,59 @@
 }
 ```
 
+## POST /auth/forgot-password
+
+Запросить ссылку для сброса пароля.
+
+**Rate limit:** максимум 5 запросов в 15 минут на IP.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+**Response (всегда одинаковый):**
+```json
+{
+  "message": "If an account with that email exists, reset instructions were sent"
+}
+```
+
+**Response (лимит превышен):**
+```json
+{
+  "error": "Too many reset attempts, please try again later"
+}
+```
+
+## POST /auth/reset-password
+
+Сбросить пароль по токену из письма.
+
+**Request Body:**
+```json
+{
+  "token": "reset_token_from_email",
+  "password": "new_secure_password"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Password has been reset successfully"
+}
+```
+
+**Response (невалидный или истекший токен):**
+```json
+{
+  "error": "Invalid or expired reset token"
+}
+```
+
 ---
 
 # Публичные маршруты

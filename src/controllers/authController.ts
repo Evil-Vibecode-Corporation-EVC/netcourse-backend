@@ -1,9 +1,14 @@
 import { Request, Response } from "express";
 import { db } from "../drizzle/db";
 import { users } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, and, gt } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import {
+  generateResetToken,
+  hashResetToken,
+  sendPasswordResetEmail,
+} from "../services/passwordResetService";
 
 const SECRET = process.env.JWT_SECRET;
 
@@ -88,5 +93,74 @@ export const login = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({ error: "Login failed" });
+  }
+};
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const { email } = (req as any).validated.body;
+
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+
+    if (!user) {
+      return res.json({
+        message: "If an account with that email exists, reset instructions were sent",
+      });
+    }
+
+    const { token, tokenHash, expiresAt } = generateResetToken();
+
+    await db
+      .update(users)
+      .set({
+        resetPasswordTokenHash: tokenHash,
+        resetPasswordExpiresAt: expiresAt,
+      })
+      .where(eq(users.id, user.id));
+
+    await sendPasswordResetEmail(user.email, token);
+
+    return res.json({
+      message: "If an account with that email exists, reset instructions were sent",
+    });
+  } catch (error) {
+    console.error("forgotPassword error:", error);
+    return res.status(500).json({ error: "Failed to process forgot password request" });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { token, password } = (req as any).validated.body;
+    const tokenHash = hashResetToken(token);
+
+    const user = await db.query.users.findFirst({
+      where: and(
+        eq(users.resetPasswordTokenHash, tokenHash),
+        gt(users.resetPasswordExpiresAt, new Date()),
+      ),
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: "Invalid or expired reset token" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await db
+      .update(users)
+      .set({
+        password: hashedPassword,
+        resetPasswordTokenHash: null,
+        resetPasswordExpiresAt: null,
+      })
+      .where(eq(users.id, user.id));
+
+    return res.json({ message: "Password has been reset successfully" });
+  } catch (error) {
+    console.error("resetPassword error:", error);
+    return res.status(500).json({ error: "Failed to reset password" });
   }
 };

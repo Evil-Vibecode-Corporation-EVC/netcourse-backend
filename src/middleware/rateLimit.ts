@@ -15,3 +15,11 @@ export const registerRateLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: "Too many registration attempts, please try again later" },
 });
+
+export const forgotPasswordRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many reset attempts, please try again later" },
+});

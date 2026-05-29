@@ -49,6 +49,11 @@ export const users = pgTable(
     username: text(),
     avatarUrl: text("avatar_url"),
     bio: text(),
+    resetPasswordTokenHash: text("reset_password_token_hash"),
+    resetPasswordExpiresAt: timestamp("reset_password_expires_at", {
+      precision: 3,
+      mode: "date",
+    }),
     createdAt: timestamp("created_at", { precision: 3, mode: "date" })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
