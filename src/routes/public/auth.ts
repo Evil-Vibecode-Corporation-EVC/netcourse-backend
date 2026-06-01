@@ -11,23 +11,36 @@ import {
   registerRateLimiter,
   forgotPasswordRateLimiter,
 } from "../../middleware/rateLimit";
-import { createUserSchema } from "../../validators/userSchemas";
+import { verifyTurnstile } from "../../middleware/turnstileMiddleware";
 import {
   forgotPasswordSchema,
   loginSchema,
+  registerSchema,
   resetPasswordSchema,
 } from "../../validators/authSchemas";
 
 const router = Router();
 
-router.post("/register", registerRateLimiter, validate(createUserSchema), register);
-router.post("/login", loginRateLimiter, validate(loginSchema), login);
+router.post(
+  "/register",
+  registerRateLimiter,
+  verifyTurnstile,
+  validate(registerSchema),
+  register,
+);
+router.post("/login", loginRateLimiter, verifyTurnstile, validate(loginSchema), login);
 router.post(
   "/forgot-password",
   forgotPasswordRateLimiter,
+  verifyTurnstile,
   validate(forgotPasswordSchema),
   forgotPassword,
 );
-router.post("/reset-password", validate(resetPasswordSchema), resetPassword);
+router.post(
+  "/reset-password",
+  verifyTurnstile,
+  validate(resetPasswordSchema),
+  resetPassword,
+);
 
 export default router;

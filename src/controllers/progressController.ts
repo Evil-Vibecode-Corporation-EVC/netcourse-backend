@@ -6,6 +6,7 @@ import {
   badges,
   userBadges,
   courses,
+  enrollments,
   sections,
   lessons,
   quizzes,
@@ -16,6 +17,17 @@ import { randomBytes } from "crypto";
 import { sanitizeUserPublic } from "../utils/userPublicFields";
 
 const awardOnCompletion = async (userId: number, courseId: number) => {
+  const enrollment = await db.query.enrollments.findFirst({
+    where: and(
+      eq(enrollments.userId, userId),
+      eq(enrollments.courseId, courseId)
+    ),
+  });
+
+  if (!enrollment) {
+    return;
+  }
+
   const existingCert = await db.query.certifications.findFirst({
     where: and(
       eq(certifications.userId, userId),
@@ -111,6 +123,25 @@ const ensureQuizCompletion = async (userId: number, courseId: number) => {
   return { ok: true } as const;
 };
 
+const ensureEnrollment = async (userId: number, courseId: number) => {
+  const enrollment = await db.query.enrollments.findFirst({
+    where: and(
+      eq(enrollments.userId, userId),
+      eq(enrollments.courseId, courseId)
+    ),
+  });
+
+  return Boolean(enrollment);
+};
+
+const ensureCourseExists = async (courseId: number) => {
+  const course = await db.query.courses.findFirst({
+    where: eq(courses.id, courseId),
+  });
+
+  return Boolean(course);
+};
+
 export const getUserProgress = async (req: Request, res: Response) => {
   try {
     const { courseId } = req.params;
@@ -136,6 +167,16 @@ export const updateUserProgress = async (req: Request, res: Response) => {
     const courseId = Number((req as any).validated.params.courseId);
     const { status } = (req as any).validated.body;
     const userId = (req as any).user.id;
+
+    const courseExists = await ensureCourseExists(courseId);
+    if (!courseExists) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    const isEnrolled = await ensureEnrollment(userId, courseId);
+    if (!isEnrolled) {
+      return res.status(403).json({ error: "User is not enrolled in this course" });
+    }
 
     if (status === "completed") {
       const result = await ensureQuizCompletion(userId, courseId);
@@ -223,6 +264,16 @@ export const updateUserProgressAdmin = async (req: Request, res: Response) => {
   try {
     const { courseId, userId } = req.params;
     const { status } = (req as any).validated.body;
+
+    const courseExists = await ensureCourseExists(Number(courseId));
+    if (!courseExists) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    const isEnrolled = await ensureEnrollment(Number(userId), Number(courseId));
+    if (!isEnrolled) {
+      return res.status(403).json({ error: "User is not enrolled in this course" });
+    }
 
     if (status === "completed") {
       const result = await ensureQuizCompletion(Number(userId), Number(courseId));

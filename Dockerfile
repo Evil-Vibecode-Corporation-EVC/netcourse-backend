@@ -32,6 +32,7 @@ ENV PORT=3000
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/package.json ./package.json
+COPY --from=builder /usr/src/app/fonts ./fonts
 COPY --from=builder /usr/src/app/entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x entrypoint.sh
