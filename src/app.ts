@@ -8,6 +8,8 @@ import cors, { CorsOptions } from "cors";
 
 const app: Application = express();
 
+app.set("trust proxy", 1);
+
 const allowedOrigins = (process.env.CORS_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())

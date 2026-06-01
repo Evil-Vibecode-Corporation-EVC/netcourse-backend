@@ -1,10 +1,7 @@
 import { Router } from "express";
 import { register, login } from "../../controllers/authController";
 import { validate} from "../../middleware/validate";
-import {
-  loginRateLimiter,
-  registerRateLimiter,
-} from "../../middleware/rateLimit";
+import { loginRateLimiter, registerRateLimiter } from "../../middleware/rateLimit";
 import { createUserSchema } from "../../validators/userSchemas";
 import { loginSchema } from "../../validators/authSchemas";
 
