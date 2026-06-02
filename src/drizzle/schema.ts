@@ -77,6 +77,7 @@ export const courses = pgTable("courses", {
   title: text().notNull(),
   description: text(),
   category: text(),
+  price: integer(),
   requireQuizCompletion: boolean("require_quiz_completion")
     .default(false)
     .notNull(),

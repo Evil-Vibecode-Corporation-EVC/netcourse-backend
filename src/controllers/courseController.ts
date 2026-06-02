@@ -9,6 +9,7 @@ export const createCourse = async (req: Request, res: Response) => {
       title,
       description,
       category,
+      price,
       requireQuizCompletion,
       minQuizScore,
     } = (req as any).validated.body;
@@ -19,6 +20,7 @@ export const createCourse = async (req: Request, res: Response) => {
         title,
         description,
         category,
+        price,
         requireQuizCompletion,
         minQuizScore,
       })
@@ -123,6 +125,7 @@ export const updateCourse = async (req: Request, res: Response) => {
       title,
       description,
       category,
+      price,
       requireQuizCompletion,
       minQuizScore,
     } = (req as any).validated.body;
@@ -133,6 +136,7 @@ export const updateCourse = async (req: Request, res: Response) => {
         title,
         description,
         category,
+        price,
         requireQuizCompletion,
         minQuizScore,
       })

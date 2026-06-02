@@ -14,17 +14,19 @@
 
 Регистрация нового пользователя.
 
-**Rate limit:** максимум 3 запроса в 60 минут на IP.
+**Rate limit:** максимум 10 запросов в 15 минут на IP.
 
 **Request Body:**
 ```json
 {
   "email": "user@example.com",
-  "password": "123456",
+  "password": "password123",
   "username": "JohnDoe",
   "avatarUrl": "https://..."
 }
 ```
+
+**Примечание:** для POST-запросов требуется Turnstile токен в заголовке `x-turnstile-token` или в теле как `turnstileToken`.
 
 **Response:**
 ```json
@@ -60,6 +62,8 @@
 }
 ```
 
+**Примечание:** для POST-запросов требуется Turnstile токен в заголовке `x-turnstile-token` или в теле как `turnstileToken`.
+
 **Response:**
 ```json
 {
@@ -94,6 +98,8 @@
 }
 ```
 
+**Примечание:** для POST-запросов требуется Turnstile токен в заголовке `x-turnstile-token` или в теле как `turnstileToken`.
+
 **Response (всегда одинаковый):**
 ```json
 {
@@ -120,6 +126,8 @@
 }
 ```
 
+**Примечание:** для POST-запросов требуется Turnstile токен в заголовке `x-turnstile-token` или в теле как `turnstileToken`.
+
 **Response:**
 ```json
 {
@@ -144,7 +152,7 @@
 
 Liveness check для оркестрации/мониторинга.
 
-**Аутентификация:** не требуется.
+**Аутентификация:** требуется.
 
 **Response:**
 ```json
@@ -322,6 +330,7 @@ Liveness check для оркестрации/мониторинга.
     "title": "JS Basics",
     "description": "intro",
     "category": "programming",
+    "price": 20000,
     "requireQuizCompletion": false,
     "minQuizScore": 65,
     "averageRating": 4.5,
@@ -343,6 +352,7 @@ Liveness check для оркестрации/мониторинга.
   "title": "JS Basics",
   "description": "intro",
   "category": "programming",
+  "price": null,
   "requireQuizCompletion": false,
   "minQuizScore": 65,
   "averageRating": 4.5,
@@ -1366,6 +1376,7 @@ Liveness check для оркестрации/мониторинга.
     "title": "JS Basics",
     "description": "intro",
     "category": "programming",
+    "price": 20000,
     "requireQuizCompletion": false,
     "minQuizScore": 65,
     "enrollments": [],
@@ -1385,6 +1396,7 @@ Liveness check для оркестрации/мониторинга.
   "title": "JS Basics",
   "description": "intro",
   "category": "programming",
+  "price": null,
   "requireQuizCompletion": false,
   "minQuizScore": 65,
   "enrollments": [],
@@ -1402,6 +1414,7 @@ Liveness check для оркестрации/мониторинга.
   "title": "JS Basics",
   "description": "intro",
   "category": "programming",
+  "price": 20000,
   "requireQuizCompletion": true,
   "minQuizScore": 65
 }
@@ -1417,6 +1430,7 @@ Liveness check для оркестрации/мониторинга.
   "title": "Updated Title",
   "description": "Updated description",
   "category": "web-development",
+  "price": null,
   "requireQuizCompletion": true,
   "minQuizScore": 70
 }
