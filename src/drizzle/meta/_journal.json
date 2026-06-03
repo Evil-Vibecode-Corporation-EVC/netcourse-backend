@@ -78,6 +78,13 @@
       "when": 1789142400001,
       "tag": "0011_course_price",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1789142400002,
+      "tag": "0012_subscriptions",
+      "breakpoints": true
     }
   ]
 }

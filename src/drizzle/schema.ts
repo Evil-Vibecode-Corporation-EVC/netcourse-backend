@@ -645,3 +645,33 @@ export const forumReplyLikes = pgTable(
       .onDelete("cascade"),
   ],
 );
+
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    id: serial().primaryKey().notNull(),
+    userId: integer("user_id").notNull(),
+    plan: text().notNull(),
+    status: text().default("active").notNull(),
+    startedAt: timestamp("started_at", { precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    expiresAt: timestamp("expires_at", { precision: 3, mode: "date" })
+      .notNull(),
+    createdAt: timestamp("created_at", { precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: "Subscriptions_user_id_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+  ],
+);

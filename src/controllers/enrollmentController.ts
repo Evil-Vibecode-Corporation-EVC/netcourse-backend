@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../drizzle/db";
-import { enrollments } from "../drizzle/schema";
-import { eq, and } from "drizzle-orm";
+import { enrollments, courses, subscriptions } from "../drizzle/schema";
+import { eq, and, gt } from "drizzle-orm";
 import { sanitizeUserPublic } from "../utils/userPublicFields";
 
 export const createEnrollment = async (req: Request, res: Response) => {
@@ -15,6 +15,30 @@ export const createEnrollment = async (req: Request, res: Response) => {
       return res
         .status(403)
         .json({ error: "forbidden: you can only enroll yourself" });
+    }
+
+    const course = await db.query.courses.findFirst({
+      where: eq(courses.id, Number(courseId)),
+    });
+
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    if (course.price != null) {
+      const sub = await db.query.subscriptions.findFirst({
+        where: and(
+          eq(subscriptions.userId, Number(userId)),
+          eq(subscriptions.status, "active"),
+          gt(subscriptions.expiresAt, new Date()),
+        ),
+      });
+
+      if (!sub) {
+        return res.status(403).json({
+          error: "Active subscription required to enroll in paid courses",
+        });
+      }
     }
 
     const [enrollment] = await db.insert(enrollments).values({

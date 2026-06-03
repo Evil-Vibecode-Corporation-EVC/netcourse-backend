@@ -5,7 +5,7 @@ import {
 	userSocialLinks, badges, userBadges, certifications, courseRatings,
 	forumPosts, forumReplies,
 	forumTags, forumPostTags, forumReplyTags,
-	forumPostLikes, forumReplyLikes, quizAttempts
+	forumPostLikes, forumReplyLikes, quizAttempts, subscriptions
 } from "./schema";
 
 export const lessonsRelations = relations(lessons, ({one, many}) => ({
@@ -81,6 +81,7 @@ export const usersRelations = relations(users, ({many}) => ({
 	forumReplies: many(forumReplies),
 	forumPostLikes: many(forumPostLikes),
 	forumReplyLikes: many(forumReplyLikes),
+	subscriptions: many(subscriptions),
 }));
 
 export const courseRatingsRelations = relations(courseRatings, ({one}) => ({
@@ -225,6 +226,13 @@ export const forumReplyLikesRelations = relations(forumReplyLikes, ({one}) => ({
 	}),
 	user: one(users, {
 		fields: [forumReplyLikes.userId],
+		references: [users.id]
+	}),
+}));
+
+export const subscriptionsRelations = relations(subscriptions, ({one}) => ({
+	user: one(users, {
+		fields: [subscriptions.userId],
 		references: [users.id]
 	}),
 }));

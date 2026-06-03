@@ -18,6 +18,8 @@ import profileRoutes from "./profiles";
 import courseRatingRoutes from "./courseRatings";
 import siteVisitsRoutes from "./siteVisits";
 import deepseekRoutes from "./deepseek";
+import subscriptionRoutes from "./subscriptions";
+import { requireActiveSubscription } from "../../middleware/subscriptionGuard";
 
 const router = Router();
 
@@ -25,8 +27,8 @@ router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/courses", courseRoutes);
 router.use("/courses/:courseId/enrollments", enrollmentRoutes);
-router.use("/courses/:courseId/sections", sectionRoutes);
-router.use("/courses/:courseId/sections/:sectionId/lessons", lessonRoutes);
+router.use("/courses/:courseId/sections", requireActiveSubscription, sectionRoutes);
+router.use("/courses/:courseId/sections/:sectionId/lessons", requireActiveSubscription, lessonRoutes);
 router.use("/courses/:courseId/progress", progressRoutes);
 router.use(
   "/courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes",
@@ -49,5 +51,6 @@ router.use("/profiles", profileRoutes);
 router.use("/courses/:courseId/ratings", courseRatingRoutes);
 router.use("/site-visits", siteVisitsRoutes);
 router.use("/deepseek", deepseekRoutes);
+router.use("/subscriptions", subscriptionRoutes);
 
 export default router;

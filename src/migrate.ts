@@ -8,7 +8,7 @@ import { Pool } from "pg";
 const MIGRATIONS_SCHEMA = "drizzle";
 const MIGRATIONS_TABLE = "__drizzle_migrations";
 const LEGACY_BASELINE_TAG = "0009_add_missing_tables";
-const LATEST_TAG = "0011_course_price";
+const LATEST_TAG = "0012_subscriptions";
 
 type JournalEntry = {
   idx: number;

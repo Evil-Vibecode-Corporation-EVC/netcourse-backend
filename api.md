@@ -409,6 +409,39 @@ Liveness check для оркестрации/мониторинга.
 
 ---
 
+## Подписки (Subscriptions)
+
+Маршруты: `/subscriptions`.
+
+### GET /subscriptions/me
+
+Получить текущую активную подписку пользователя.
+
+**Аутентификация:** требуется.
+
+**Response (активная подписка):**
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "plan": "monthly",
+  "status": "active",
+  "startedAt": "2026-05-01T00:00:00.000Z",
+  "expiresAt": "2026-06-01T00:00:00.000Z",
+  "createdAt": "2026-05-01T00:00:00.000Z",
+  "updatedAt": "2026-05-01T00:00:00.000Z"
+}
+```
+
+**Response (нет активной подписки):**
+```json
+null
+```
+
+**Примечание:** Возвращается только действующая подписка (`status = "active"` и `expiresAt > now`). Если подписка истекла или отсутствует — вернётся `null`. Запись на платные курсы и доступ к их контенту блокируются без активной подписки.
+
+---
+
 ## Разделы (Sections)
 
 Маршруты: `/courses/:courseId/sections`.
@@ -2051,6 +2084,84 @@ Liveness check для оркестрации/мониторинга.
 ```
 
 **Примечание:** Сертификаты создаются автоматически при завершении курса (установке статуса прогресса в `"completed"`).
+
+---
+
+## Подписки (Subscriptions)
+
+Маршруты: `/admin/users/:userId/subscriptions`.
+
+### GET /admin/users/:userId/subscriptions
+
+Получить все подписки пользователя.
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "plan": "monthly",
+    "status": "active",
+    "startedAt": "2026-05-01T00:00:00.000Z",
+    "expiresAt": "2026-06-01T00:00:00.000Z",
+    "createdAt": "2026-05-01T00:00:00.000Z",
+    "updatedAt": "2026-05-01T00:00:00.000Z"
+  }
+]
+```
+
+### POST /admin/users/:userId/subscriptions
+
+Создать подписку для пользователя.
+
+**Request Body:**
+```json
+{
+  "plan": "monthly",
+  "expiresAt": "2026-12-01T00:00:00.000Z"
+}
+```
+
+**Поля:**
+- `plan` (enum, обязательное) — `"monthly"` или `"yearly"`
+- `expiresAt` (string ISO datetime, опциональное) — если не указан, рассчитывается автоматически (+1 месяц для monthly, +1 год для yearly)
+
+**Response:** `201`
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "plan": "monthly",
+  "status": "active",
+  "startedAt": "2026-05-01T00:00:00.000Z",
+  "expiresAt": "2026-12-01T00:00:00.000Z",
+  "createdAt": "2026-05-01T00:00:00.000Z",
+  "updatedAt": "2026-05-01T00:00:00.000Z"
+}
+```
+
+### PUT /admin/users/:userId/subscriptions/:id
+
+Обновить подписку.
+
+**Request Body (все поля опциональны):**
+```json
+{
+  "plan": "yearly",
+  "expiresAt": "2027-06-01T00:00:00.000Z",
+  "status": "active"
+}
+```
+
+**Допустимые значения status:**
+- `"active"` — подписка активна
+- `"expired"` — подписка истекла
+- `"cancelled"` — подписка отменена
+
+### DELETE /admin/users/:userId/subscriptions/:id
+
+Отменить подписку (устанавливает `status = "cancelled"`).
 
 ---
 
