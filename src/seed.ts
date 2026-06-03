@@ -18,40 +18,50 @@ async function seed() {
   console.log("🌱 Seeding database...");
 
   try {
-    const [cyberCourse, networkingCourse, programmingCourse] = await db
-      .insert(schema.courses)
-      .values([
-        {
-          title: "Основы кибербезопасности",
-          description:
-            "Курс знакомит с основами защиты информации, типами угроз, методами шифрования и принципами безопасности сетей.",
-          category: "cybersecurity",
-          price: 0,
-          requireQuizCompletion: true,
-          minQuizScore: 65,
-        },
-        {
-          title: "Компьютерные сети и протоколы",
-          description:
-            "Курс охватывает основы сетевых технологий: модели OSI и TCP/IP, IP-адресацию, маршрутизацию, протоколы HTTP, DNS, DHCP.",
-          category: "networking",
-          price: 0,
-          requireQuizCompletion: true,
-          minQuizScore: 70,
-        },
-        {
-          title: "Введение в программирование на Python",
-          description:
-            "Базовый курс по программированию на языке Python: переменные, условия, циклы, функции, работа с файлами.",
-          category: "programming",
-          price: 0,
-          requireQuizCompletion: true,
-          minQuizScore: 65,
-        },
-      ])
-      .returning();
+    const [cyberCourse, networkingCourse, programmingCourse, webSecCourse] =
+      await db
+        .insert(schema.courses)
+        .values([
+          {
+            title: "Основы кибербезопасности",
+            description:
+              "Курс знакомит с основами защиты информации, типами угроз, методами шифрования и принципами безопасности сетей.",
+            category: "cybersecurity",
+            price: null,
+            requireQuizCompletion: true,
+            minQuizScore: 65,
+          },
+          {
+            title: "Компьютерные сети и протоколы",
+            description:
+              "Курс охватывает основы сетевых технологий: модели OSI и TCP/IP, IP-адресацию, маршрутизацию, протоколы HTTP, DNS, DHCP.",
+            category: "networking",
+            price: null,
+            requireQuizCompletion: true,
+            minQuizScore: 70,
+          },
+          {
+            title: "Введение в программирование на Python",
+            description:
+              "Базовый курс по программированию на языке Python: переменные, условия, циклы, функции, работа с файлами.",
+            category: "programming",
+            price: null,
+            requireQuizCompletion: true,
+            minQuizScore: 65,
+          },
+          {
+            title: "Основы веб-безопасности",
+            description:
+              "Курс по основам безопасности веб-приложений: OWASP Top 10, XSS, SQL-инъекции, CSRF и методы защиты. Требуется активная подписка.",
+            category: "cybersecurity",
+            price: 1500,
+            requireQuizCompletion: true,
+            minQuizScore: 70,
+          },
+        ])
+        .returning();
 
-    console.log("✅ Added 3 courses");
+    console.log("✅ Added 4 courses");
 
     const cyberSections = await db
       .insert(schema.sections)
@@ -130,7 +140,18 @@ async function seed() {
       ])
       .returning();
 
-    console.log("✅ Added 15 sections (5 per course)");
+    const [webSecSection] = await db
+      .insert(schema.sections)
+      .values([
+        {
+          courseId: webSecCourse.id,
+          title: "Уязвимости веб-приложений",
+          orderIndex: 0,
+        },
+      ])
+      .returning();
+
+    console.log("✅ Added 16 sections");
 
     // Cybersecurity lessons (Russian)
     await db.insert(schema.lessons).values([
@@ -599,9 +620,191 @@ def қош_келдің(ат, тіл="kk"):
       },
     ]);
 
+    const [webSecLesson1, webSecLesson2] = await db
+      .insert(schema.lessons)
+      .values([
+        {
+          sectionId: webSecSection.id,
+          title: "OWASP Top 10: основные угрозы",
+          contentType: "text",
+          textContent: `# OWASP Top 10: основные угрозы веб-приложений
+
+OWASP (Open Web Application Security Project) публикует список 10 самых критичных угроз для веб-приложений.
+
+## 1. Broken Access Control
+Нарушение контроля доступа — пользователь получает доступ к данным или функциям, на которые у него нет прав.
+
+**Пример:** Изменение ID в URL для просмотра чужого профиля.
+
+## 2. Cryptographic Failures
+Слабое шифрование или его отсутствие. Пароли в открытом виде, устаревшие алгоритмы.
+
+## 3. Injection (SQL, NoSQL, OS Command)
+Внедрение вредоносных данных в интерпретатор.
+
+**Пример SQL-инъекции:**
+\`\`\`sql
+' OR '1'='1' --
+\`\`\`
+Такой ввод может обойти аутентификацию.
+
+## 4. Insecure Design
+Ошибки в архитектуре приложения: отсутствие лимитов, слабая валидация.
+
+## 5. Security Misconfiguration
+Ошибки конфигурации: стандартные пароли, открытые порты, включённые debug-режимы.
+
+## 6. Vulnerable and Outdated Components
+Использование библиотек с известными уязвимостями.
+
+## 7. Identification and Authentication Failures
+Слабая аутентификация: нет MFA, простые пароли, уязвимости в сессиях.
+
+## 8. Software and Data Integrity Failures
+Нарушение целостности: отсутствие проверки подписей обновлений.
+
+## 9. Security Logging and Monitoring Failures
+Отсутствие логирования и мониторинга инцидентов.
+
+## 10. Server-Side Request Forgery (SSRF)
+Атакующий заставляет сервер делать запросы к внутренним ресурсам.
+
+## Основные методы защиты
+- Валидация и экранирование всех входных данных
+- Параметризованные запросы к БД
+- Принцип наименьших привилегий
+- Регулярное обновление зависимостей
+- Использование Content-Security-Policy заголовков`,
+          orderIndex: 0,
+        },
+        {
+          sectionId: webSecSection.id,
+          title: "XSS и CSRF атаки",
+          contentType: "text",
+          textContent: `# XSS (Cross-Site Scripting) и CSRF
+
+## XSS — Межсайтовый скриптинг
+
+Внедрение JavaScript кода на страницу, который выполняется в браузере жертвы.
+
+### Типы XSS
+| Тип | Описание |
+|-----|----------|
+| Reflected (отражённый) | Код передаётся в URL и сразу выполняется |
+| Stored (сохранённый) | Код сохраняется на сервере (в БД) |
+| DOM-based | Уязвимость на стороне клиента |
+
+### Пример Reflected XSS
+\`\`\`html
+https://example.com/search?q=<script>alert('XSS')</script>
+\`\`\`
+
+### Защита от XSS
+- Экранирование вывода (htmlspecialchars, DOMPurify)
+- Content-Security-Policy заголовок
+- HttpOnly куки
+
+## CSRF (Cross-Site Request Forgery)
+
+Атакующий заставляет жертву выполнить нежелательное действие на сайте, где она аутентифицирована.
+
+### Защита от CSRF
+- CSRF-токены в формах
+- SameSite куки (Strict/Lax)
+- Проверка Origin/Referer заголовков`,
+          orderIndex: 1,
+        },
+      ])
+      .returning();
+
     console.log(
-      "✅ Added 12 lessons (4 cybersecurity, 5 networking, 5 programming)",
+      "✅ Added 14 lessons (4 cybersecurity, 5 networking, 5 programming, 2 web security)",
     );
+
+    const [webSecQuiz] = await db
+      .insert(schema.quizzes)
+      .values([{ lessonId: webSecLesson1.id, title: "OWASP Top 10: проверка" }])
+      .returning();
+
+    console.log("✅ Added 1 quiz for web security");
+
+    const [q1, q2, q3] = await db
+      .insert(schema.questions)
+      .values([
+        {
+          quizId: webSecQuiz.id,
+          questionText:
+            "Какой тип XSS передаётся через URL и выполняется сразу?",
+          questionType: "single",
+        },
+        {
+          quizId: webSecQuiz.id,
+          questionText:
+            "Какие из перечисленных методов помогают защититься от SQL-инъекций?",
+          questionType: "multiple",
+        },
+        {
+          quizId: webSecQuiz.id,
+          questionText: "Какой заголовок HTTP помогает защититься от XSS-атак?",
+          questionType: "single",
+        },
+      ])
+      .returning();
+
+    await db.insert(schema.answers).values([
+      {
+        questionId: q1.id,
+        answerText: "Reflected XSS",
+        isCorrect: true,
+      },
+      {
+        questionId: q1.id,
+        answerText: "Stored XSS",
+        isCorrect: false,
+      },
+      {
+        questionId: q1.id,
+        answerText: "DOM-based XSS",
+        isCorrect: false,
+      },
+      {
+        questionId: q2.id,
+        answerText: "Параметризованные запросы (Prepared Statements)",
+        isCorrect: true,
+      },
+      {
+        questionId: q2.id,
+        answerText: "Экранирование спецсимволов вручную",
+        isCorrect: true,
+      },
+      {
+        questionId: q2.id,
+        answerText: "Использование ORM без валидации",
+        isCorrect: false,
+      },
+      {
+        questionId: q2.id,
+        answerText: "Проверка типа входных данных (типизация)",
+        isCorrect: false,
+      },
+      {
+        questionId: q3.id,
+        answerText: "Content-Security-Policy",
+        isCorrect: true,
+      },
+      {
+        questionId: q3.id,
+        answerText: "Access-Control-Allow-Origin",
+        isCorrect: false,
+      },
+      {
+        questionId: q3.id,
+        answerText: "X-Frame-Options",
+        isCorrect: false,
+      },
+    ]);
+
+    console.log("✅ Added 3 questions and 10 answers for web security quiz");
     console.log("✅ Seeding completed successfully!");
   } catch (error) {
     console.error("❌ Seeding failed:", error);
