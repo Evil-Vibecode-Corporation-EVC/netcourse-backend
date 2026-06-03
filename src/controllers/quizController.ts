@@ -18,6 +18,7 @@ export const createQuiz = async (req: Request, res: Response) => {
 
     res.status(201).json(quiz);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to create quiz" });
   }
 };
@@ -36,6 +37,7 @@ export const getAllQuizzes = async (req: Request, res: Response) => {
 
     res.json(quizzesList);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to fetch quizzes" });
   }
 };
@@ -61,6 +63,7 @@ export const getQuizById = async (req: Request, res: Response) => {
 
     res.json(quiz);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to fetch quiz" });
   }
 };
@@ -164,6 +167,7 @@ export const submitQuizAttempt = async (req: Request, res: Response) => {
       minScore,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to submit quiz attempt" });
   }
 };
@@ -185,6 +189,7 @@ export const updateQuiz = async (req: Request, res: Response) => {
 
     res.json(updated);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to update quiz" });
   }
 };
@@ -197,6 +202,7 @@ export const deleteQuiz = async (req: Request, res: Response) => {
 
     res.status(204).send();
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to delete quiz" });
   }
 };

@@ -26,6 +26,6 @@ export const errorHandler = (
   }
 
   return res.status(status).json({
-    error: err?.message || "Internal Server Error",
+    error: status >= 500 ? "Internal Server Error" : err?.message || "Unknown error",
   });
 };

@@ -158,6 +158,16 @@ export const deleteCourse = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
+    const [existing] = await db
+      .select({ id: courses.id })
+      .from(courses)
+      .where(eq(courses.id, Number(id)))
+      .limit(1);
+
+    if (!existing) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
     await db.delete(courses).where(eq(courses.id, Number(id)));
 
     res.status(204).send();

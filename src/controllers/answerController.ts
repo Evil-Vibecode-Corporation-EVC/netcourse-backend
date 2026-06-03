@@ -18,7 +18,8 @@ export const createAnswer = async (req: Request, res: Response) => {
       .returning();
 
     res.status(201).json(answer);
-  } catch {
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to create answer" });
   }
 };
@@ -30,7 +31,8 @@ export const getAllAnswers = async (req: Request, res: Response) => {
     });
 
     res.json(answersList);
-  } catch {
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to fetch answers" });
   }
 };
@@ -50,7 +52,8 @@ export const getAnswerById = async (req: Request, res: Response) => {
     if (!answer) return res.status(404).json({ error: "Answer not found" });
 
     res.json(answer);
-  } catch {
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to fetch answer" });
   }
 };
@@ -71,7 +74,8 @@ export const updateAnswer = async (req: Request, res: Response) => {
     }
 
     res.json(updated);
-  } catch {
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to update answer" });
   }
 };
@@ -83,7 +87,8 @@ export const deleteAnswer = async (req: Request, res: Response) => {
     await db.delete(answers).where(eq(answers.id, Number(id)));
 
     res.status(204).send();
-  } catch {
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to delete answer" });
   }
 };
