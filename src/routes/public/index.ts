@@ -29,17 +29,20 @@ router.use("/courses", courseRoutes);
 router.use("/courses/:courseId/enrollments", enrollmentRoutes);
 router.use("/courses/:courseId/sections", requireActiveSubscription, sectionRoutes);
 router.use("/courses/:courseId/sections/:sectionId/lessons", requireActiveSubscription, lessonRoutes);
-router.use("/courses/:courseId/progress", progressRoutes);
+router.use("/courses/:courseId/progress", requireActiveSubscription, progressRoutes);
 router.use(
   "/courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes",
+  requireActiveSubscription,
   quizRoutes,
 );
 router.use(
   "/courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes/:quizId/questions",
+  requireActiveSubscription,
   questionRoutes,
 );
 router.use(
   "/courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes/:quizId/questions/:questionId/answers",
+  requireActiveSubscription,
   answerRoutes,
 );
 router.use("/social-links", socialLinksRoutes);
@@ -48,7 +51,7 @@ router.use("/certifications", certificationsRoutes);
 router.use("/forum/posts", forumPostsRoutes);
 router.use("/forum/posts/:postId/replies", forumRepliesRoutes);
 router.use("/profiles", profileRoutes);
-router.use("/courses/:courseId/ratings", courseRatingRoutes);
+router.use("/courses/:courseId/ratings", requireActiveSubscription, courseRatingRoutes);
 router.use("/site-visits", siteVisitsRoutes);
 router.use("/deepseek", deepseekRoutes);
 router.use("/subscriptions", subscriptionRoutes);
