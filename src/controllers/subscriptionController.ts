@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../drizzle/db";
 import { subscriptions } from "../drizzle/schema";
-import { eq, and, gt } from "drizzle-orm";
+import { eq, and, gt, or, isNull } from "drizzle-orm";
 
 export const createSubscription = async (req: Request, res: Response) => {
   try {
@@ -95,6 +95,87 @@ export const getUserSubscriptions = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch subscriptions" });
+  }
+};
+
+const calcExpiry = (plan: string, from: Date): Date => {
+  const d = new Date(from);
+  if (plan === "monthly") d.setMonth(d.getMonth() + 1);
+  else d.setFullYear(d.getFullYear() + 1);
+  return d;
+};
+
+export const selfSubscribe = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const { plan } = (req as any).validated.body;
+    const now = new Date();
+
+    const activeSub = await db.query.subscriptions.findFirst({
+      where: and(
+        eq(subscriptions.userId, userId),
+        eq(subscriptions.status, "active"),
+        or(gt(subscriptions.expiresAt, now), isNull(subscriptions.expiresAt)),
+      ),
+    });
+
+    if (activeSub) {
+      const remaining = activeSub.expiresAt.getTime() - now.getTime();
+      const extra = calcExpiry(plan, new Date()).getTime() - now.getTime();
+      const newExpires = new Date(now.getTime() + remaining + extra);
+
+      const [sub] = await db
+        .update(subscriptions)
+        .set({ plan, expiresAt: newExpires, updatedAt: now })
+        .where(eq(subscriptions.id, activeSub.id))
+        .returning();
+
+      return res.json(sub);
+    }
+
+    const [sub] = await db
+      .insert(subscriptions)
+      .values({
+        userId,
+        plan,
+        status: "active",
+        startedAt: now,
+        expiresAt: calcExpiry(plan, now),
+      })
+      .returning();
+
+    res.status(201).json(sub);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to create subscription" });
+  }
+};
+
+export const cancelMySubscription = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const now = new Date();
+
+    const [sub] = await db
+      .update(subscriptions)
+      .set({ status: "cancelled", updatedAt: now })
+      .where(
+        and(
+          eq(subscriptions.userId, userId),
+          eq(subscriptions.status, "active"),
+          gt(subscriptions.expiresAt, now),
+        ),
+      )
+      .returning();
+
+    if (!sub) {
+      return res.status(404).json({ error: "Active subscription not found" });
+    }
+
+    res.json(sub);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to cancel subscription" });
   }
 };
 

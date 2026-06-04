@@ -7,6 +7,12 @@ export const createSubscriptionSchema = z.object({
   }),
 });
 
+export const selfSubscribeSchema = z.object({
+  body: z.object({
+    plan: z.enum(["monthly", "yearly"]),
+  }),
+});
+
 export const updateSubscriptionSchema = z.object({
   params: z.object({
     id: z.string(),
