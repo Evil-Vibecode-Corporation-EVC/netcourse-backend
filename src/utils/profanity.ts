@@ -75,6 +75,7 @@ function normalize(text: string): string {
 }
 
 export function containsProfanity(text: string): boolean {
+  if (!text) return false;
   const normalized = normalize(text);
   if (!normalized) return false;
 
