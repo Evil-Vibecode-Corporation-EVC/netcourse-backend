@@ -19,6 +19,7 @@ import courseRatingRoutes from "./courseRatings";
 import siteVisitsRoutes from "./siteVisits";
 import deepseekRoutes from "./deepseek";
 import subscriptionRoutes from "./subscriptions";
+import uploadRoutes from "./upload";
 import { requireActiveSubscription } from "../../middleware/subscriptionGuard";
 
 const router = Router();
@@ -55,5 +56,6 @@ router.use("/courses/:courseId/ratings", requireActiveSubscription, courseRating
 router.use("/site-visits", siteVisitsRoutes);
 router.use("/deepseek", deepseekRoutes);
 router.use("/subscriptions", subscriptionRoutes);
+router.use("/users", uploadRoutes);
 
 export default router;

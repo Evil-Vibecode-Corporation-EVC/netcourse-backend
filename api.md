@@ -264,6 +264,24 @@ Liveness check для оркестрации/мониторинга.
 
 Удалить пользователя.
 
+### PUT /users/avatar
+
+Загрузить аватар. Файл загружается в Cloudflare R2, `avatarUrl` обновляется автоматически.
+
+**Request:** `multipart/form-data`
+
+| Поле | Тип | Описание |
+|---|---|---|
+| `avatar` | file | JPEG, PNG или WebP, до 2 MB |
+
+**Response:** обновлённый объект пользователя (без пароля)
+
+### DELETE /users/avatar
+
+Удалить аватар. Файл удаляется из Cloudflare R2, `avatarUrl` становится `null`.
+
+**Response:** обновлённый объект пользователя
+
 ---
 
 ## Публичные профили (Profiles)
