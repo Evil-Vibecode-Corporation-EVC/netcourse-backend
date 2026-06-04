@@ -43,8 +43,15 @@ export const register = async (req: Request, res: Response) => {
       })
       .returning();
 
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      SECRET,
+      { expiresIn: "7d" },
+    );
+
     res.status(201).json({
       message: "User registered successfully",
+      token,
       user: {
         id: user.id,
         email: user.email,
