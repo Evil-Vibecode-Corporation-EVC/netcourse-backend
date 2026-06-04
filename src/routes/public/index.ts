@@ -25,6 +25,7 @@ import { requireActiveSubscription } from "../../middleware/subscriptionGuard";
 const router = Router();
 
 router.use("/auth", authRoutes);
+router.use("/users", uploadRoutes);
 router.use("/users", userRoutes);
 router.use("/courses", courseRoutes);
 router.use("/courses/:courseId/enrollments", enrollmentRoutes);
@@ -56,6 +57,5 @@ router.use("/courses/:courseId/ratings", requireActiveSubscription, courseRating
 router.use("/site-visits", siteVisitsRoutes);
 router.use("/deepseek", deepseekRoutes);
 router.use("/subscriptions", subscriptionRoutes);
-router.use("/users", uploadRoutes);
 
 export default router;
