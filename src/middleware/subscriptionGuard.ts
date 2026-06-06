@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
 import { db } from "../drizzle/db";
 import { courses, subscriptions } from "../drizzle/schema";
 import { eq, and, gt } from "drizzle-orm";
+
+const SECRET = process.env.JWT_SECRET;
 
 export const requireActiveSubscription = async (
   req: Request,
@@ -25,9 +28,22 @@ export const requireActiveSubscription = async (
       return next();
     }
 
-    const userId = (req as any).user?.id;
+    let userId = (req as any).user?.id;
+
     if (!userId) {
-      return res.status(401).json({ error: "Unauthorized" });
+      const header = req.headers.authorization;
+      if (header?.startsWith("Bearer ")) {
+        const token = header.split(" ")[1];
+        try {
+          const decoded = jwt.verify(token, SECRET!) as { id: number };
+          userId = decoded.id;
+          (req as any).user = { ...(req as any).user, id: decoded.id };
+        } catch {
+          return res.status(401).json({ error: "Invalid token" });
+        }
+      } else {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
     }
 
     const sub = await db.query.subscriptions.findFirst({
