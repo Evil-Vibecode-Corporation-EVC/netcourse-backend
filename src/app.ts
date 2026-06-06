@@ -53,12 +53,6 @@ app.get("/health", (_req, res) => {
   });
 });
 
-app.use("/api/admin", (req, _res, next) => {
-  if (!req.body) req.body = {};
-  req.body.turnstileToken = "BYPASS";
-  req.headers["x-turnstile-token"] = "BYPASS";
-  next();
-});
 app.use("/api", publicRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/admin", express.static("public/admin"));

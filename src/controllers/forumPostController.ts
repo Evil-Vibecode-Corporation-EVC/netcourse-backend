@@ -7,6 +7,7 @@ import {
   forumPostLikes,
   forumReplyTags,
   forumReplyLikes,
+  forumPostAttachments,
 } from "../drizzle/schema";
 import { eq, desc, sql, inArray, and } from "drizzle-orm";
 import { sanitizeUserPublic } from "../utils/userPublicFields";
@@ -154,9 +155,11 @@ export const createForumPost = async (req: Request, res: Response) => {
       where: eq(forumPosts.id, post.id),
       with: {
         user: true,
+        attachments: true,
         replies: {
           with: {
             user: true,
+            attachments: true,
           },
         },
       },
@@ -208,9 +211,11 @@ export const getAllForumPosts = async (req: Request, res: Response) => {
       where: whereClause,
       with: {
         user: true,
+        attachments: true,
         replies: {
           with: {
             user: true,
+            attachments: true,
           },
         },
       },
@@ -264,9 +269,11 @@ export const getForumPostById = async (req: Request, res: Response) => {
       where: eq(forumPosts.id, Number(postId)),
       with: {
         user: true,
+        attachments: true,
         replies: {
           with: {
             user: true,
+            attachments: true,
           },
         },
       },
@@ -352,9 +359,11 @@ export const updateForumPost = async (req: Request, res: Response) => {
       where: eq(forumPosts.id, updated.id),
       with: {
         user: true,
+        attachments: true,
         replies: {
           with: {
             user: true,
+            attachments: true,
           },
         },
       },

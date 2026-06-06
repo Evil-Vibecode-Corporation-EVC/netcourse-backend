@@ -6,6 +6,7 @@ import {
   forumTags,
   forumReplyTags,
   forumReplyLikes,
+  forumReplyAttachments,
 } from "../drizzle/schema";
 import { eq, asc, sql, inArray, and } from "drizzle-orm";
 import { sanitizeUserPublic } from "../utils/userPublicFields";
@@ -124,6 +125,7 @@ export const createForumReply = async (req: Request, res: Response) => {
       with: {
         user: true,
         post: true,
+        attachments: true,
       },
     });
 
@@ -165,6 +167,7 @@ export const getForumRepliesForPost = async (req: Request, res: Response) => {
       where: eq(forumReplies.postId, Number(postId)),
       with: {
         user: true,
+        attachments: true,
       },
       orderBy: asc(forumReplies.createdAt),
       limit,
@@ -246,6 +249,7 @@ export const updateForumReply = async (req: Request, res: Response) => {
       with: {
         user: true,
         post: true,
+        attachments: true,
       },
     });
 

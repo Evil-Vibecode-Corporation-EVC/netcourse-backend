@@ -22,7 +22,7 @@ export const verifyTurnstile = async (
     
     const token = req.body.turnstileToken || req.headers["x-turnstile-token"];
 
-    if (token === "BYPASS") {
+    if (process.env.TURNSTILE_SKIP_VERIFICATION === "true") {
       return next();
     }
 
@@ -50,6 +50,7 @@ export const verifyTurnstile = async (
         headers: {
           "Content-Type": "application/json",
         },
+        timeout: 10_000,
       },
     );
 

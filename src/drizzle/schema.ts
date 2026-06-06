@@ -646,6 +646,54 @@ export const forumReplyLikes = pgTable(
   ],
 );
 
+export const forumPostAttachments = pgTable(
+  "forum_post_attachments",
+  {
+    id: serial().primaryKey().notNull(),
+    postId: integer("post_id").notNull(),
+    r2Key: text("r2_key").notNull(),
+    fileName: text("file_name").notNull(),
+    mimeType: text("mime_type").notNull(),
+    fileSize: integer("file_size").notNull(),
+    createdAt: timestamp("created_at", { precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.postId],
+      foreignColumns: [forumPosts.id],
+      name: "ForumPostAttachments_post_id_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+  ],
+);
+
+export const forumReplyAttachments = pgTable(
+  "forum_reply_attachments",
+  {
+    id: serial().primaryKey().notNull(),
+    replyId: integer("reply_id").notNull(),
+    r2Key: text("r2_key").notNull(),
+    fileName: text("file_name").notNull(),
+    mimeType: text("mime_type").notNull(),
+    fileSize: integer("file_size").notNull(),
+    createdAt: timestamp("created_at", { precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.replyId],
+      foreignColumns: [forumReplies.id],
+      name: "ForumReplyAttachments_reply_id_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+  ],
+);
+
 export const subscriptions = pgTable(
   "subscriptions",
   {

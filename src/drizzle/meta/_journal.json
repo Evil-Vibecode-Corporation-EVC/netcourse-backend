@@ -85,6 +85,13 @@
       "when": 1789142400002,
       "tag": "0012_subscriptions",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1751727600000,
+      "tag": "0013_forum_attachments",
+      "breakpoints": true
     }
   ]
 }
