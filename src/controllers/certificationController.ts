@@ -165,7 +165,7 @@ export const getCertificatePdf = async (req: Request, res: Response) => {
       .fontSize(36)
       .font("Roboto-Bold")
       .fillColor(emeraldLight)
-      .text("Сертификат о Прохождении", mx, 120, { align: "center" });
+      .text("Сертификат о прохождении", mx, 120, { align: "center" });
 
     doc
       .strokeColor(emeraldAccent)
@@ -176,26 +176,23 @@ export const getCertificatePdf = async (req: Request, res: Response) => {
       .stroke();
     doc.opacity(1);
 
-    // ✅ Roboto для обычного текста
     doc
       .fontSize(14)
       .font("Roboto")
       .fillColor(lightText)
-      .text("Настоящим подтверждается, что", mx, 210, { align: "center" });
+      .text("Настоящий сертификат подтверждает, что", mx, 210, { align: "center" });
 
-    // ✅ Roboto-Bold для имени пользователя
     doc
       .fontSize(28)
       .font("Roboto-Bold")
       .fillColor(emeraldAccent)
       .text(username, mx, 260, { align: "center" });
 
-    // ✅ Roboto для обычного текста
     doc
       .fontSize(14)
       .font("Roboto")
       .fillColor(lightText)
-      .text("успешно завершил(а) курс", mx, 320, {
+      .text("прошёл обучение по курсу", mx, 320, {
         align: "center",
       });
 
@@ -220,7 +217,7 @@ export const getCertificatePdf = async (req: Request, res: Response) => {
       .fontSize(11)
       .font("Roboto")
       .fillColor(lightText)
-      .text(`Выдан ${issuedOn}`, mx, 450, { align: "center" });
+      .text(`Дата выдачи: ${issuedOn}`, mx, 450, { align: "center" });
 
     // ✅ Roboto для кода
     doc
