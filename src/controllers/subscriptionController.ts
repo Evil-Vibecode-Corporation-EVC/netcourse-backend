@@ -16,6 +16,8 @@ export const createSubscription = async (req: Request, res: Response) => {
       expires = new Date(now);
       if (plan === "monthly") {
         expires.setMonth(expires.getMonth() + 1);
+      } else if (plan === "quarterly") {
+        expires.setMonth(expires.getMonth() + 3);
       } else {
         expires.setFullYear(expires.getFullYear() + 1);
       }
@@ -101,6 +103,7 @@ export const getUserSubscriptions = async (req: Request, res: Response) => {
 const calcExpiry = (plan: string, from: Date): Date => {
   const d = new Date(from);
   if (plan === "monthly") d.setMonth(d.getMonth() + 1);
+  else if (plan === "quarterly") d.setMonth(d.getMonth() + 3);
   else d.setFullYear(d.getFullYear() + 1);
   return d;
 };

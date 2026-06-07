@@ -57,7 +57,7 @@ router.use("/forum/posts/:postId/replies", forumRepliesRoutes);
 router.use("/forum/posts/:postId/replies/:replyId", forumReplyAttachmentRoutes);
 router.use("/forum/posts/:postId", forumAttachmentRoutes);
 router.use("/profiles", profileRoutes);
-router.use("/courses/:courseId/ratings", requireActiveSubscription, courseRatingRoutes);
+router.use("/courses/:courseId/ratings", courseRatingRoutes);
 router.use("/site-visits", siteVisitsRoutes);
 router.use("/deepseek", deepseekRoutes);
 router.use("/subscriptions", subscriptionRoutes);
