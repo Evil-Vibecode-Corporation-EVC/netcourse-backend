@@ -203,6 +203,28 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
+export const getMe = async (req: Request, res: Response) => {
+  try {
+    const currentUser = (req as any).user;
+
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, currentUser.id),
+      with: {
+        enrollments: true,
+        progresses: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "user not found" });
+    }
+
+    res.json(sanitizeUserWithRelations(user));
+  } catch (error) {
+    res.status(500).json({ error: "failed to fetch user" });
+  }
+};
+
 export const getPublicProfileById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
