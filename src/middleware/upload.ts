@@ -23,6 +23,18 @@ export const uploadAvatar = multer({
   },
 }).single("avatar");
 
+export const uploadBadgeImage = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: AVATAR_MAX_SIZE },
+  fileFilter: (_req, file, cb) => {
+    if (AVATAR_MIME_TYPES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only JPEG, PNG, and WebP images are allowed"));
+    }
+  },
+}).single("image");
+
 export const uploadForumAttachment = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: FORUM_MAX_SIZE },
