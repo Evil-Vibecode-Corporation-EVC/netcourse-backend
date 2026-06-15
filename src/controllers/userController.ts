@@ -6,8 +6,14 @@ import {
   forumReplies,
 } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
-import bcrypt from "bcryptjs";
+import * as argon2 from "argon2";
 import { sanitizeUserPrivate, sanitizeUserPublic } from "../utils/userPublicFields";
+
+const PEPPER = process.env.PASSWORD_PEPPER;
+
+if (!PEPPER) {
+  throw new Error("PASSWORD_PEPPER is required");
+}
 
 const sanitizeUserWithRelations = (user: any) => {
   if (!user) return user;
@@ -63,7 +69,7 @@ export const createUser = async (req: Request, res: Response) => {
     const { email, password, username, avatarUrl, bio } = (req as any).validated
       .body;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await argon2.hash(password + PEPPER);
 
     const [user] = await db
       .insert(users)
@@ -130,7 +136,7 @@ export const updateUser = async (req: Request, res: Response) => {
     if (bio !== undefined) updateData.bio = bio;
 
     if (password !== undefined) {
-      updateData.password = await bcrypt.hash(password, 10);
+      updateData.password = await argon2.hash(password + PEPPER);
     }
 
     const [user] = await db

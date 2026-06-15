@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { db } from "../drizzle/db";
 import { users } from "../drizzle/schema";
 import { eq, and, gt } from "drizzle-orm";
-import bcrypt from "bcryptjs";
+import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import {
   generateResetToken,
@@ -14,6 +14,12 @@ const SECRET = process.env.JWT_SECRET;
 
 if (!SECRET) {
   throw new Error("JWT_SECRET is required");
+}
+
+const PEPPER = process.env.PASSWORD_PEPPER;
+
+if (!PEPPER) {
+  throw new Error("PASSWORD_PEPPER is required");
 }
 
 export const register = async (req: Request, res: Response) => {
@@ -29,7 +35,7 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Email already registered" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await argon2.hash(password + PEPPER);
 
     const [user] = await db
       .insert(users)
@@ -46,7 +52,7 @@ export const register = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       SECRET,
-      { expiresIn: "7d" },
+      { expiresIn: "14d" },
     );
 
     res.status(201).json({
@@ -77,7 +83,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await argon2.verify(user.password, password + PEPPER);
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
@@ -85,7 +91,7 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       SECRET,
-      { expiresIn: "7d" },
+      { expiresIn: "14d" },
     );
 
     res.json({
@@ -154,7 +160,7 @@ export const resetPassword = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid or expired reset token" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await argon2.hash(password + PEPPER);
 
     await db
       .update(users)
